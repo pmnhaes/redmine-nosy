@@ -55,13 +55,28 @@ class Redmine(object):
     def update_issue(self, issue_id, activity, date,
                                     worked_hours=4, comment=None):
         self.browser.visit('http://sgsetec.renapi.gov.br/issues/%s/time_entries/new' % issue_id)
+        self.browser.fill('time_entry[spent_on]', date)
         self.browser.find_by_id('time_entry_hours').fill(worked_hours)
-        self.browser.select('Atividade', self.activities_codes[activity.capitalize()])
+        self.browser.select('time_entry[activity_id]', self.activities_codes[activity.capitalize()])
         self.browser.find_by_value('Salvar').click()
 
     def finish_issue(self, issue_id, begin, total_days, activity):
         #do not need to plus um day into cause first day of work is 'begin'
-        for day_worked in xrange(total_days):
-            date = str(datetime.datetime.strptime(entrada, "%Y/%m/%d") + 
-                        datetime.timedelta(day_worked))
-            self.update_issue(issue_id=issue_id, date=date, activity=activity)
+        day_worked = 0
+        while day_worked < total_days:
+            date = datetime.datetime.strptime(begin, "%Y-%m-%d")
+            date = date.date() + datetime.timedelta(day_worked)
+            day_worked += 1
+            if date.weekday() > 4:
+              total_days += 1
+              continue
+              date = date.date() + datetime.timedelta(day_worked)
+            self.update_issue(issue_id=issue_id, date=str(date), activity=activity)
+        self.close_issue(issue_id)
+
+
+    def close_issue(self, issue_id):
+        self.browser.visit('http://sgsetec.renapi.gov.br/issues/%s/time_entries/new' % issue_id)
+        self.browser.select('issue[status_id]', '3')
+        self.browser.select('issue[done_ratio]', '100')
+        self.browser.find_by_value('Salvar').click()

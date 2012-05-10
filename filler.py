@@ -72,7 +72,10 @@ class Redmine(object):
               continue
               date = date.date() + datetime.timedelta(day_worked)
             self.update_issue(issue_id=issue_id, date=str(date), activity=activity)
+        self.close_issue(issue_id)
 
+
+    def close_issue(self, issue_id):
         self.browser.visit('http://sgsetec.renapi.gov.br/issues/%s/time_entries/new' % issue_id)
         self.browser.select('issue[status_id]', '3')
         self.browser.select('issue[done_ratio]', '100')

@@ -55,13 +55,14 @@ class Redmine(object):
     def update_issue(self, issue_id, activity, date,
                                     worked_hours=4, comment=None):
         self.browser.visit('http://sgsetec.renapi.gov.br/issues/%s/time_entries/new' % issue_id)
+        self.browser.fill('time_entry[spent_on]', date)
         self.browser.find_by_id('time_entry_hours').fill(worked_hours)
-        self.browser.select('Atividade', self.activities_codes[activity.capitalize()])
+        self.browser.select('time_entry[activity_id]', self.activities_codes[activity.capitalize()])
         self.browser.find_by_value('Salvar').click()
 
     def finish_issue(self, issue_id, begin, total_days, activity):
         #do not need to plus um day into cause first day of work is 'begin'
         for day_worked in xrange(total_days):
-            date = str(datetime.datetime.strptime(entrada, "%Y/%m/%d") + 
-                        datetime.timedelta(day_worked))
+            date = datetime.datetime.strptime(begin, "%Y-%m-%d")
+            date = str(date.date() + datetime.timedelta(day_worked))
             self.update_issue(issue_id=issue_id, date=date, activity=activity)

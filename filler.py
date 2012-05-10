@@ -2,7 +2,7 @@
 from base64 import b32decode as decode
 from base64 import b32encode as encode
 from getpass import getpass
-from splinter import Browser
+from splinter.browser import Browser
 
 class Redmine(object):
 

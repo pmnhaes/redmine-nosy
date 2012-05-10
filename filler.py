@@ -62,7 +62,18 @@ class Redmine(object):
 
     def finish_issue(self, issue_id, begin, total_days, activity):
         #do not need to plus um day into cause first day of work is 'begin'
-        for day_worked in xrange(total_days):
+        day_worked = 0
+        while day_worked < total_days:
             date = datetime.datetime.strptime(begin, "%Y-%m-%d")
-            date = str(date.date() + datetime.timedelta(day_worked))
-            self.update_issue(issue_id=issue_id, date=date, activity=activity)
+            date = date.date() + datetime.timedelta(day_worked)
+            day_worked += 1
+            if date.weekday() > 4:
+              total_days += 1
+              continue
+              date = date.date() + datetime.timedelta(day_worked)
+            self.update_issue(issue_id=issue_id, date=str(date), activity=activity)
+
+        self.browser.visit('http://sgsetec.renapi.gov.br/issues/%s/time_entries/new' % issue_id)
+        self.browser.select('issue[status_id]', '3')
+        self.browser.select('issue[done_ratio]', '100')
+        self.browser.find_by_value('Salvar').click()

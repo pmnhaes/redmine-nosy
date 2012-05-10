@@ -32,11 +32,13 @@ Closing issue informing how long it tooks::
 
 
 Only closing issue::
+
 # close_issue(issue_id)
 >>> redmine = Redmine()
 >>> Digite seu usuário: fulano
 >>> Digite sua senha:
 >>> redmine.close_issue(4563)
+
 
 
 create_issue still in tests
